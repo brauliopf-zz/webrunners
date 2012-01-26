@@ -22,6 +22,7 @@
 	width: 300px;
 	margin-top: 5px;
 }
+
 #category-picture img{
 	padding: 0px;
 	height: 300px;
@@ -43,7 +44,7 @@
 	color: #333333;
 }
 #categorywrap .view-all {
-	background-image: url(../images/viewall_.png);
+	background-image: url(../images/viewall.png);
 	background-repeat: no-repeat;
 	height: 39px;
 	width: 304px;
