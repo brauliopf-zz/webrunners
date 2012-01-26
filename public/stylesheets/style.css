@@ -2,6 +2,7 @@ body {
 	margin-top: 0px;
 	background-color: #c7ccd4;
 	padding: 50px;
+	padding-top: 0px;
 	font: 14px "Lucida Grande", "Helvetica Nueue", Arial, sans-serif;
 }
 h1,
@@ -26,7 +27,7 @@ a.button {
   margin: 0 10px 0 0;
   padding: 2px 4px;
   text-shadow: #faf9f9 0 1px 1px;
-  background-color: #ccc;
+  background-color: #eee;
   text-decoration: none;
   color: #000;
   -moz-border-radius: 4px;
@@ -34,7 +35,7 @@ a.button {
   border-radius: 4px;
 }
 a.button:hover {
-  background-color: #efefef;
+  background-color: #fff;
 }
 h2 a.button {
   margin-left: 10px;
@@ -54,60 +55,7 @@ textarea {
 
 /* *******From here, I copied ;)******* */
 
-/*Featured Item*/
-.new {
-	position: absolute;
-	top: -3px;
-	right: 0px;
-}
-
-#slider #featureditem1 .itemdescription span, #slider #featureditem2 .itemdescription span, #slider #featureditem3 .itemdescription span {
-	font-family: Arial, Helvetica, sans-serif;
-	font-size: 14px;
-	color: #b9b9b9;
-	padding-left: 10px;
-}
-#slider #featureditem1 .itemdescription, #slider #featureditem2 .itemdescription, #slider #featureditem3 .itemdescription {
-	background-image: url(../images/itemdescription.png);
-	background-repeat: no-repeat;
-	height: 40px;
-	width: 825px;
-	position:relative;
-	top: 187px;
-	padding: 16px 55px 0 60px;
-}
-#featureditem1 {
-	background-image: url(../images/featured1.png);
-	background-repeat: no-repeat;
-	height: 243px;
-	width: 940px;
-	margin-top: 30px;
-}
-#featureditem2 {
-	background-image: url(../images/featured2.png);
-	background-repeat: no-repeat;
-	height: 243px;
-	width: 940px;
-	margin-top: 30px;
-}
-#featureditem3 {
-	background-image: url(../images/featured3.png);
-	background-repeat: no-repeat;
-	height: 243px;
-	width: 940px;
-	margin-top: 30px;
-}
-#slider {
-	height: 243px;
-	width: 940px;
-	overflow: hidden;
-	padding-bottom: 30px;
-}
-/*End of featured item*/
-
-
 /*Wrapper*/
-
 #wrapper {
 	width: 940px;
 	background-image:url(../images/bgbody.jpg);
@@ -115,104 +63,3 @@ textarea {
 	margin: 0 auto 0 auto;
 	padding-top: 30px;
 }
-
-/*Category*/
-
-#categorywrap p {
-	padding: 10px 10px 0 5px;
-}
-#categorywrap {
-	margin: 30px 0 30px 0;
-	padding: 30px 0px 30px 0px;
-	border-top-width: 1px;
-	border-top-style: solid;
-	border-top-color: #b3b4b7;
-	border-bottom-width: 1px;
-	border-bottom-style: solid;
-	border-bottom-color: #b3b4b7;
-}
-.category {
-	float: left;
-	width: 300px;
-}
-.category-middle {
-	float: left;
-	width: 300px;
-	margin: 0 20px 0 20px;
-}
-#categorywrap a {
-	font-family: Arial, Helvetica, sans-serif;
-	font-weight: bold;
-	font-size: 12px;
-	color: #d56528;
-	padding-left: 5px;
-	margin-bottom: 10px;
-	margin: 0px;
-	display: inline;
-	text-decoration: none;
-}
-#categorywrap a:hover {
-	color: #333333;
-}
-#categorywrap .view-all {
-	background-image: url(../images/viewall.png);
-	background-repeat: no-repeat;
-	height: 39px;
-	width: 300px;
-	position: relative;
-	top: 102px;
-}
-#categorywrap .view-all a {
-	display: block;
-	height: 39px;
-	width: 300px;
-	line-height: 38px;
-	text-align: center;
-	padding: 0px;
-}
-#categorywrap .view-all a:hover {
-	color: white;
-}
-#category-picture1 {
-	background-image: url(../images/catimage1.png);
-	background-repeat: no-repeat;
-	height: 141px;
-	width: 300px;
-	margin-top: 30px;
-}
-#category-picture2 {
-	background-image: url(../images/catimage2.png);
-	background-repeat: no-repeat;
-	height: 141px;
-	width: 300px;
-	margin-top: 30px;
-}
-#category-picture3 {
-	background-image: url(../images/catimage3.png);
-	background-repeat: no-repeat;
-	height: 141px;
-	width: 300px;
-	margin-top: 30px;
-}
-#category-picture4 {
-	background-image: url(../images/catimage4.png);
-	background-repeat: no-repeat;
-	height: 141px;
-	width: 300px;
-	margin-top: 30px;
-}
-#category-picture5 {
-	background-image: url(../images/catimage5.png);
-	background-repeat: no-repeat;
-	height: 141px;
-	width: 300px;
-	margin-top: 30px;
-}
-#category-picture6 {
-	background-image: url(../images/catimage6.png);
-	background-repeat: no-repeat;
-	height: 141px;
-	width: 300px;
-	margin-top: 30px;
-}
-/*End of category*/

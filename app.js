@@ -73,8 +73,13 @@ function loadUser(req, res, next) {
  * Route: General use
  */
 app.get('/', function(req, res) {
-	res.render('index', {title:'WebRunners'});
+	Offer.find({}, [], { sort: ['start', 'descending'] }, function(err, offers) {
+		if(!err) {
+			res.render('index', {title:'WebRunners', offers: offers });
+		}
+	});
 });
+
 app.get('/admin', function(req, res) {
 	res.render('./admin', {title:'WebRunners'});
 });
@@ -293,8 +298,7 @@ app.del('/documents/:id.:format?', function(req, res) {
  */
 // List
 app.get('/offers', function(req, res) {
-	console.log('BLSBLSLBSLBSL');
-	Offer.find({}, [], { sort: ['title', 'descending'] }, function(err, offers) {
+	Offer.find({}, [], { sort: ['date', 'descending'] }, function(err, offers) {
 		if(!err) {
 			res.render('offers', {
 				locals: { offers: offers }
@@ -364,6 +368,7 @@ app.put('/offers/:id.:format?', function(req, res) {
 		if(!err) {
 			// Do something with it
 			offer.name = req.body.offer.name;
+			offer.start = req.body.offer.start;
 			offer.description = req.body.offer.description;
 			offer.image = req.body.offer.image;
 

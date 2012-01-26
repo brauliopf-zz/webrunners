@@ -1,0 +1,51 @@
+/*Featured Item*/
+.new {
+	position: relative;
+	top: -2px;
+	left: 802px;
+}
+
+#slider #featureditem1 .itemdescription span, #slider #featureditem2 .itemdescription span, #slider #featureditem3 .itemdescription span {
+	font-family: Arial, Helvetica, sans-serif;
+	font-size: 14px;
+	color: #b9b9b9;
+	padding-left: 10px;
+}
+#slider #featureditem1 .itemdescription, #slider #featureditem2 .itemdescription, #slider #featureditem3 .itemdescription {
+	background-image: url(../images/itemdescription.png);
+	background-repeat: no-repeat;
+	height: 40px;
+	width: 825px;
+	position:relative;
+	top: 187px;
+	padding: 16px 55px 0 60px;
+}
+#featureditem1 {
+	background-image: url(../images/running_.jpg);
+	background-repeat: no-repeat;
+	height: 243px;
+	width: 940px;
+	margin-top: 30px;
+}
+#featureditem2 {
+	background-image: url(../images/featured2.png);
+	background-repeat: no-repeat;
+	height: 243px;
+	width: 940px;
+	margin-top: 30px;
+}
+#featureditem3 {
+	background-image: url(../images/featured3.png);
+	background-repeat: no-repeat;
+	height: 243px;
+	width: 940px;
+	margin-top: 30px;
+}
+#slider {
+	height: 243px;
+	width: 940px;
+	overflow: hidden;
+	padding-bottom: 10px;
+	margin-bottom: 50px;
+}
+/*End of featured item*/

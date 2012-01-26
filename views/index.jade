@@ -25,28 +25,40 @@
 				| Aliquam luctus lectus sit amet nibh facilisis feugiat. Morbi ullamcorper sem ut justo gravida at imperdiet facilisis.
 //- End of Featured item
 
-//- Category
+//- List Offers
+
+//- End of List Offers
+
+- var middle = false;
+- var len = offers.length;
+// - for (index in offers) {
+- for ( index = 0; index < len; index++ ) {
 #categorywrap
 	.category
-		a(href='#') CATEGORY ONE +
-		p
-		| Aliquam luctus lectus sit amet nifacilisis feugiat. Morbi ullamcorper sem ut justo gravida at imperdiet.
-		#category-picture1
+		#category-picture
+			img(src='/images/' + offers[index].image, alt='new')
 			.view-all
-				a(href='#') #{text_button}
+				a(href='#')
+					b #{offers[index].name}
+				p #{offers[index].description}
+	- if(index+1 < len) {
+		- index++;
 	.category-middle
-		a(href='#') CATEGORY TWO +
-		p
-		| Morbi ullamcorper sem ut justo gravida at imperdiet. Aliquam luctus lectus sit amet nifacilisis feugiat.
-		#category-picture2
+		#category-picture
+			img(src='/images/' + offers[index].image, alt='new')
 			.view-all
-				a(href='#') #{text_button}
+				a(href='#')
+					b #{offers[index].name}
+				p #{offers[index].description}
+	- }
+	- if(index+1 < len) {
+		- index++;
 	.category
-		a(href='#') CATEGORY THREE +
-		p
-		| Aliquam luctus lectus sit amet nifacilisis feugiat. Morbi ullamcorper sem ut justo gravida at imperdiet.
-		#category-picture3
+		#category-picture
+			img(src='/images/' + offers[index].image, alt='new')
 			.view-all
-				a(href='#') #{text_button}
-	.clear
-//- End of Category
+				a(href='#')
+					b #{offers[index].name}
+				p #{offers[index].description}
+	- }
+-}

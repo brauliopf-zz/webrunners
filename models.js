@@ -2,6 +2,8 @@
 // Once they’ve been defined it’s possible to decorate them with virtual attributes and middleware.
 // Virtual attributes are getters and setters, and middleware is a convenient way of injecting functions into key lifecycle events.
 
+// Schema Types: http://mongoosejs.com/docs/schematypes.html
+
 var crypto = require('crypto');
 
 function defineModels(mongoose, fn){
@@ -96,6 +98,7 @@ function defineModels(mongoose, fn){
 	
 	var OfferSchema = new Schema({
 		'name': { type: String, index: true },
+		'start': { type: Date, default: Date.now },
 		'description': String,
 		'image': String,
 		'user_id': ObjectId
