@@ -11,8 +11,7 @@ var express = require('express'),
 	app = module.exports = express.createServer(),
     models = require('./models'),
     db,
-	Document,
-	User;
+	Document, User, Offer;
 
 // Configuration
 // Middleware ordering is important
@@ -30,25 +29,26 @@ app.configure(function(){
 app.configure('development', function(){ // Configuring different environments
 	app.use(express.logger());
 	app.use(express.errorHandler({ dumpExceptions: true, showStack: true }));
-	app.set('db-uri', 'mongodb://localhost/nodepad-development'); //Instantiate database connection
+	app.set('db-uri', 'mongodb://localhost/webrunners-development'); //Instantiate database connection
 });
 
 app.configure('production', function(){ // Configuring different environments
 	app.use(express.logger());
 	app.use(express.errorHandler()); 
-	app.set('db-uri', 'mongodb://localhost/nodepad-production'); //Instantiate database connection
+	app.set('db-uri', 'mongodb://localhost/webrunner-production'); //Instantiate database connection
 });
 
 app.configure('test', function() {
 	app.use(express.logger());
 	app.use(express.errorHandler({ dumpExceptions: true, showStack: true }));
-	app.set('db-uri', 'mongodb://localhost/nodepad-test');
+	app.set('db-uri', 'mongodb://localhost/webrunner-test');
 });
 
 // Define models
 models.defineModels(mongoose, function() {
 	app.Document = Document = mongoose.model('DocumentModel');
 	app.User = User = mongoose.model('UserModel');
+	app.Offer = Offer = mongoose.model('OfferModel');
 	db = mongoose.connect(app.set('db-uri')); //Instantiate database connection
 })
 
@@ -68,6 +68,16 @@ function loadUser(req, res, next) {
 	res.redirect('/sessions/new');
 	}
 }
+
+/*
+ * Route: General use
+ */
+app.get('/', function(req, res) {
+	res.render('index', {title:'WebRunners'});
+});
+app.get('/admin', function(req, res) {
+	res.render('./admin', {title:'WebRunners'});
+});
 
 /*
  * Route: Users
@@ -162,8 +172,8 @@ app.del('/sessions', loadUser, function(req, res) {
 /*
  * Route: Documents
  */
-// Home
-app.get('/', loadUser, function(req, res) {
+// List
+app.get('/documents', function(req, res) {
 	Document.find({}, [], { sort: ['title', 'descending'] }, function(err, docs) {
 		if(!err) {
 			res.render('documents', {
@@ -174,7 +184,7 @@ app.get('/', loadUser, function(req, res) {
 });
 
 // Edit
-app.get('/documents/:id.:format?/edit', loadUser, function(req, res) {
+app.get('/documents/:id.:format?/edit', function(req, res) {
 	Document.findById(req.params.id, function(err, doc) {
 		if(!err) {
 			res.render('documents/edit.jade', {
@@ -185,7 +195,7 @@ app.get('/documents/:id.:format?/edit', loadUser, function(req, res) {
 });
 
 // New
-app.get('/documents/new', loadUser, function(req, res) {
+app.get('/documents/new', function(req, res) {
 	res.render('documents/new.jade', {
 		locals: { d: new Document() }
 	});
@@ -256,7 +266,7 @@ app.put('/documents/:id.:format?', function(req, res) {
 // Delete document
 app.del('/documents/:id.:format?', function(req, res) {
 	// Load the document
-	Document.findById(req.params.id, function(err, doc) {
+	Offer.findById(req.params.id, function(err, doc) {
 		if(!err) {
 			// Do something with it
 			doc.title = req.params.title;
@@ -272,6 +282,126 @@ app.del('/documents/:id.:format?', function(req, res) {
 
 				default:
 				res.redirect('/');
+				}
+			});
+		}
+	});
+});
+
+/*
+ * Route: Offer
+ */
+// List
+app.get('/offers', function(req, res) {
+	console.log('BLSBLSLBSLBSL');
+	Offer.find({}, [], { sort: ['title', 'descending'] }, function(err, offers) {
+		if(!err) {
+			res.render('offers', {
+				locals: { offers: offers }
+			});
+		}
+	});
+});
+
+// Edit
+app.get('/offers/:id.:format?/edit', function(req, res) {
+	Offer.findById(req.params.id, function(err, offer) {
+		if(!err) {
+			res.render('offers/edit.jade', {
+				locals: { offer: offer }
+			});
+		}
+	});
+});
+
+// New
+app.get('/offers/new', function(req, res) {
+	res.render('offers/new.jade', {
+		locals: { offer: new Offer() }
+	});
+});
+
+/* ***CRUD Offer*** */
+// Create offer
+app.post('/offers.:format?', function(req, res) {
+    var offer = new Offer(req.body.offer);
+    offer.save( function(err) {
+        if(!err) {
+			switch (req.params.format) {
+	        	case 'json':
+		            res.send(offer.__offer);
+	            break;
+
+		        default:
+		            res.redirect('/offers');
+	        }
+		}
+    });
+});
+
+// Read offer
+app.get('/offers/:id.:format?', function(req, res) {
+    Offer.findById(req.params.id, function(err, offer) {
+		if(!err) {
+	        switch (req.params.format) {
+		        case 'json':
+		            res.send(offer.__offer);
+		            break;
+
+		        default:
+		            res.render('offers/show.jade', {
+		                locals: { offer: offer }
+		            });
+	        }
+		}
+    });
+});
+
+// Update offer
+app.put('/offers/:id.:format?', function(req, res) {
+	// Load the offer
+	Offer.findById(req.body.offer.id, function(err, offer) {
+		if(!err) {
+			// Do something with it
+			offer.name = req.body.offer.name;
+			offer.description = req.body.offer.description;
+			offer.image = req.body.offer.image;
+
+			// Persist the changes
+			offer.save( function() {
+				// Respond according to the request format
+				switch (req.params.format) {
+					case 'json':
+						res.send(offer.__offer);
+					break;
+					
+					default:
+						res.redirect('/offers');
+				}
+			});
+		}
+	});
+});
+
+// Delete offer
+app.del('/offers/:id.:format?', function(req, res) {
+	// Load the offer
+	Offer.findById(req.params.id, function(err, offer) {
+		if(!err) {
+			// Do something with it
+			offer.title = req.params.title;
+			offer.data = req.params.data;
+
+			// Persist the changes
+			offer.remove( function() {
+				// Respond according to the request format
+				switch (req.params.format) {
+				case 'json':
+				res.send(offer.__offer);
+				break;
+
+				default:
+				res.redirect('/offers');
 				}
 			});
 		}

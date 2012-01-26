@@ -1,2 +1,52 @@
-h1= title
-p Welcome to #{title}
+- var text_button = 'Ver detalhes'
+
+//- Featured item
+#slider
+	#featureditem1
+		.new
+			img(src='images/new.png', alt='new')
+		.itemdescription
+			h1 SOME TITLE :
+			span
+				| Aliquam luctus lectus sit amet nibh facilisis feugiat. Morbi ullamcorper sem ut justo gravida at imperdiet facilisis.
+	#featureditem2
+		.new
+			img(src='images/new.png', alt='new')
+		.itemdescription
+			h1 SOME TITLE :
+			span
+				| Aliquam luctus lectus sit amet nibh facilisis feugiat. Morbi ullamcorper sem ut justo gravida at imperdiet facilisis.
+	#featureditem3
+		.new
+			img(src='images/new.png', alt='new')
+		.itemdescription
+			h1 SOME TITLE :
+			span
+				| Aliquam luctus lectus sit amet nibh facilisis feugiat. Morbi ullamcorper sem ut justo gravida at imperdiet facilisis.
+//- End of Featured item
+
+//- Category
+#categorywrap
+	.category
+		a(href='#') CATEGORY ONE +
+		p
+		| Aliquam luctus lectus sit amet nifacilisis feugiat. Morbi ullamcorper sem ut justo gravida at imperdiet.
+		#category-picture1
+			.view-all
+				a(href='#') #{text_button}
+	.category-middle
+		a(href='#') CATEGORY TWO +
+		p
+		| Morbi ullamcorper sem ut justo gravida at imperdiet. Aliquam luctus lectus sit amet nifacilisis feugiat.
+		#category-picture2
+			.view-all
+				a(href='#') #{text_button}
+	.category
+		a(href='#') CATEGORY THREE +
+		p
+		| Aliquam luctus lectus sit amet nifacilisis feugiat. Morbi ullamcorper sem ut justo gravida at imperdiet.
+		#category-picture3
+			.view-all
+				a(href='#') #{text_button}
+	.clear
+//- End of Category

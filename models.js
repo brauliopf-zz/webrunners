@@ -86,6 +86,36 @@ function defineModels(mongoose, fn){
 	 * Used ofr session persistence
 	 */
 	
+	/*
+	 * Model: Offer
+	 */
+	function validatePresenceOf(value){
+		// validate offer attributes
+		return value && value.length;
+	}
+	
+	var OfferSchema = new Schema({
+		'name': { type: String, index: true },
+		'description': String,
+		'image': String,
+		'user_id': ObjectId
+	});
+
+	OfferSchema.virtual('id').get(function() {
+		return this._id.toHexString();
+	});
+
+	OfferSchema.pre('save', function(next) {
+		if (!validatePresenceOf(this.name)) {
+			next(new Error('Invalid name'));
+		} else {
+			next();
+		}
+	});
+
+	//tell mongoose about the schema I just created
+	mongoose.model('OfferModel', OfferSchema);
+	
 	fn();
 }
 

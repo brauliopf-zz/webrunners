@@ -1,0 +1,13 @@
+h2=offer.name
+  a(class='button', href='/offers/' + offer.id + '/edit') Edit
+p
+  a(href='/offers', class='button')
+    &larr; All Offers
+
+p
+  b Description: 
+  =offer.description
+
+p
+  b Image: 
+  =offer.image

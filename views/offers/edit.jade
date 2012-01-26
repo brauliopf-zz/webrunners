@@ -1,0 +1,5 @@
+h2 Edit Document
+form(method='post', action='/offers/' + offer.id)
+	input(name='offer[id]', value=offer.id, type='hidden')
+	input(name='_method', value='PUT', type='hidden')
+	!=partial('../partials/offers_fields', { locals: { offer: offer } })

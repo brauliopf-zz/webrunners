@@ -1,6 +1,6 @@
-h2 New Document
-form(method='post', action='/documents')
-	!=partial('../partials/documents_fields', { locals: { d: d } })
+h2 New Offer
+form(method='post', action='/offers')
+	!=partial('../partials/offers_fields', { locals: { offer: offer } })
 
 //- action='/documents' => when submitted, it redirects to /document
 //- Not equal means include a variable without escaping it first
