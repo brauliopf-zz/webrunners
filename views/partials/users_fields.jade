@@ -1,10 +1,14 @@
 div
+	label Name:
+	input(name='user[name]', value=user.name || '')
+
+div
 	label Email:
 	input(name='user[email]', value=user.email || '')
 
 div
 	label Password:
-	input(name='user[password]', value=user.password || '', type='password')
+	input(name='user[password]', value= '', type='password')
 
 //- name: Assigns a name to the given field so that you may reference it later.
 //- value: assigns a predefined value to the form element.

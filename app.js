@@ -87,6 +87,30 @@ app.get('/admin', function(req, res) {
 /*
  * Route: Users
  */
+
+// List
+app.get('/users', function(req, res) {
+	// User.find({}, [], { sort: ['name', 'descending'] }, function(err, users) {
+	User.find({}, function(err, users) {
+		if(!err) {
+			res.render('users', {
+				locals: { users: users }
+			});
+		}
+	});
+});
+
+// Edit
+app.get('/users/:id.:format?/edit', function(req, res) {
+	User.findById(req.params.id, function(err, user) {
+		if(!err) {
+			res.render('users/edit.jade', {
+				locals: { user: user }
+			});
+		}
+	});
+});
+
 // New
 app.get('/users/new', function(req, res) {
 	res.render('users/new.jade', {
@@ -94,7 +118,8 @@ app.get('/users/new', function(req, res) {
 	});
 });
 
-// Create
+/* ***CRUD User*** */
+// Create user
 app.post('/users.:format?', function(req, res) {
 
     var user = new User(req.body.user);
@@ -115,12 +140,88 @@ app.post('/users.:format?', function(req, res) {
 	            break;
 
 		        default:
-					req.session.user_id = user.id;
-		            res.redirect('/');
+					// req.session.user_id = user.id;
+		            res.redirect('/users');
 	        }
 		}
     });
 
+});
+
+// Read user
+app.get('/users/:id.:format?', function(req, res) {
+    User.findById(req.params.id, function(err, user) {
+		if(!err) {
+	        switch (req.params.format) {
+		        case 'json':
+		            res.send(user.__user);
+		            break;
+
+		        default:
+		            res.render('users/show.jade', {
+		                locals: { user: user }
+		            });
+	        }
+		}
+    });
+});
+
+// Update user
+app.put('/users/:id.:format?', function(req, res) {
+
+	function userSaveFailed() {
+		req.flash('error', 'Account creation failed');
+		res.render('users/new.jade', {
+			locals: { user: user }
+		});
+	}
+	
+	// Load the user
+	User.findById(req.body.user.id, function(err, user) {
+		if(!err) {
+			// Do something with it
+			user.name = req.body.user.name;
+			user.email = req.body.user.email;
+			if(req.body.user.password != null)
+				user.password = req.body.user.hashed_password;
+
+			// Persist the changes
+			user.save( function(err) {
+		        if(err) return userSaveFailed();
+				else {
+					switch (req.params.format) {
+			        	case 'json':
+				            res.send(user.toObject());
+			            break;
+
+				        default:
+							// req.session.user_id = user.id;
+				            res.redirect('/users');
+			        }
+				}
+		    });
+		}
+	});
+});
+
+// Delete user
+app.del('/users/:id.:format?', function(req, res) {
+	// Load the user
+	User.findById(req.params.id, function(err, user) {
+		if(!err) {
+			user.remove( function() {
+				// Respond according to the request format
+				switch (req.params.format) {
+				case 'json':
+				res.send(user.__user);
+				break;
+
+				default:
+				res.redirect('/users');
+				}
+			});
+		}
+	});
 });
 
 /*
