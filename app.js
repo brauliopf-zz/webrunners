@@ -8,8 +8,9 @@ var express = require('express'),
 	mongoStore = require('connect-mongodb'),
 	jade = require('jade'),
 	stylus = require('stylus'),
+	models = require('./models'),
+	routes = require('./routes'),
 	app = module.exports = express.createServer(),
-    models = require('./models'),
     db,
 	Document, User, Offer;
 
@@ -394,37 +395,9 @@ app.del('/documents/:id.:format?', function(req, res) {
 	});
 });
 
-/*
- * Route: Offer
- */
-// List
-app.get('/offers', function(req, res) {
-	Offer.find({}, [], { sort: ['date', 'descending'] }, function(err, offers) {
-		if(!err) {
-			res.render('offers', {
-				locals: { offers: offers }
-			});
-		}
-	});
-});
-
-// Edit
-app.get('/offers/:id.:format?/edit', function(req, res) {
-	Offer.findById(req.params.id, function(err, offer) {
-		if(!err) {
-			res.render('offers/edit.jade', {
-				locals: { offer: offer }
-			});
-		}
-	});
-});
-
-// New
-app.get('/offers/new', function(req, res) {
-	res.render('offers/new.jade', {
-		locals: { offer: new Offer() }
-	});
-});
+app.get('/offers', routes.oindex(Offer));
+app.get('/offers/:id.:format?/edit', routes.oedit(Offer));
+app.get('/offers/new', routes.onew(Offer));
 
 /* ***CRUD Offer*** */
 // Create offer
