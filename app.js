@@ -114,7 +114,7 @@ function loadUser(req, res, next) {
 /*
  * Route: General use
  */
-app.get('/', loadUser, function(req, res) {
+app.get('/', function(req, res) {
 	Offer.find({}, [], { sort: ['start', 'descending'] }, function(err, offers) {
 		if(!err) {
 			res.render('index', {
@@ -126,7 +126,7 @@ app.get('/', loadUser, function(req, res) {
 	});
 });
 
-app.get('/admin', loadUser, function(req, res) {
+app.get('/admin', function(req, res) {
 	res.render('./admin', { title:'WebRunners', currentUser: req.currentUser });
 });
 
@@ -310,7 +310,7 @@ app.post('/sessions', function(req, res) {
 });
 
 // Delete
-app.del('/sessions', loadUser, function(req, res) {
+app.del('/sessions', function(req, res) {
 	if (req.session) { LoginToken.remove({ email: req.currentUser.email }, function() {});
 	    res.clearCookie('logintoken');
 	    req.session.destroy(function() {});
