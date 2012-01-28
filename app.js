@@ -117,17 +117,13 @@ function loadUser(req, res, next) {
 app.get('/', loadUser, function(req, res) {
 	Offer.find({}, [], { sort: ['start', 'descending'] }, function(err, offers) {
 		if(!err) {
-			res.render('index', {
-				title:'WebRunners',
-				offers: offers,
-				currentUser: req.currentUser
-			});
+			res.render('index', { title:'WebRunners', offers: offers });
 		}
 	});
 });
 
-app.get('/admin', loadUser, function(req, res) {
-	res.render('./admin', { title:'WebRunners', currentUser: req.currentUser });
+app.get('/admin', function(req, res) {
+	res.render('./admin', {title:'WebRunners'});
 });
 
 /*
