@@ -10,8 +10,7 @@ var express = require('express'),
 	stylus = require('stylus'),
 	app = module.exports = express.createServer(),
     models = require('./models'),
-    db,
-	Document, User, Offer;
+    db, Document, User, Offer, LoginToken;
 
 // Configuration
 // Middleware ordering is important
@@ -46,16 +45,55 @@ app.configure('test', function() {
 
 // Define models
 models.defineModels(mongoose, function() {
-	app.Document = Document = mongoose.model('DocumentModel');
-	app.User = User = mongoose.model('UserModel');
-	app.Offer = Offer = mongoose.model('OfferModel');
-	db = mongoose.connect(app.set('db-uri')); //Instantiate database connection
+    app.Document = Document = mongoose.model('DocumentModel');
+    app.User = User = mongoose.model('UserModel');
+    app.Offer = Offer = mongoose.model('OfferModel');
+    app.LoginToken = LoginToken = mongoose.model('LoginTokenModel');
+    db = mongoose.connect(app.set('db-uri'));
+    //Instantiate database connection
 })
 
+function authenticateFromLoginToken(req, res, next) {
+   var cookie = JSON.parse(req.cookies.logintoken);
+
+   LoginToken.findOne({
+		email: cookie.email,
+		series: cookie.series,
+		token: cookie.token
+   }, (function(err, token) {
+        if (!token) {
+            res.redirect('/sessions/new');
+            return;
+        }
+
+        User.findOne({ email: token.email }, function(err, user) {
+			// Get user to sign in
+            if (user) {
+                req.session.user_id = user.id;
+                req.currentUser = user;
+
+				// Renew Token
+                token.token = token.randomToken();
+                token.save(function() {
+                    res.cookie('logintoken', token.cookieValue, {
+                        expires: new Date(Date.now() + 2 * 604800000),
+                        path: '/'
+                    });
+                    next();
+                });
+            } else {
+                res.redirect('/sessions/new');
+            }
+       	});
+   	}));
+}
+
 function loadUser(req, res, next) {
+	// Se já existe uma sessão iniciada com um id
 	if (req.session.user_id) {
 		User.findById(req.session.user_id, function(err, user) {
 			if(!err) {
+				// Verifica se o usuário que quer acessar é o dono da sessão
 				if (user) {
 					 req.currentUser = user;
 					 next();
@@ -64,8 +102,10 @@ function loadUser(req, res, next) {
 				}
 			}
 		});
-	// } else if (req.cookies.logintoken) {
-	//     	authenticateFromLoginToken(req, res, next);
+	// Se não existe uma sessão iniciada, verifica os cookies => autentica e faz login
+	} else if (req.cookies.logintoken) {
+	    	authenticateFromLoginToken(req, res, next);
+	// Se nem cookie existe, então o jeito é fazer login
 	} else {
 		res.redirect('/sessions/new');
 	}
@@ -92,8 +132,7 @@ app.get('/admin', function(req, res) {
 
 // List
 app.get('/users', function(req, res) {
-	// User.find({}, [], { sort: ['name', 'descending'] }, function(err, users) {
-	User.find({}, function(err, users) {
+	User.find({}, [], { sort: ['name', 'descending'] }, function(err, users) {
 		if(!err) {
 			res.render('users', {
 				locals: { users: users }
