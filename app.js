@@ -63,16 +63,18 @@ function loadUser(req, res, next) {
 					 res.redirect('/sessions/new');
 				}
 			}
-	});
+		});
+	// } else if (req.cookies.logintoken) {
+	//     	authenticateFromLoginToken(req, res, next);
 	} else {
-	res.redirect('/sessions/new');
+		res.redirect('/sessions/new');
 	}
 }
 
 /*
  * Route: General use
  */
-app.get('/', function(req, res) {
+app.get('/', loadUser, function(req, res) {
 	Offer.find({}, [], { sort: ['start', 'descending'] }, function(err, offers) {
 		if(!err) {
 			res.render('index', { title:'WebRunners', offers: offers });
@@ -140,8 +142,8 @@ app.post('/users.:format?', function(req, res) {
 	            break;
 
 		        default:
-					// req.session.user_id = user.id;
-		            res.redirect('/users');
+					req.session.user_id = user.id;
+		            res.redirect('/');
 	        }
 		}
     });
@@ -182,8 +184,9 @@ app.put('/users/:id.:format?', function(req, res) {
 			// Do something with it
 			user.name = req.body.user.name;
 			user.email = req.body.user.email;
-			if(req.body.user.password != null)
-				user.password = req.body.user.hashed_password;
+			if(req.body.user.password != ''){
+				user.password = req.body.user.password;
+			}
 
 			// Persist the changes
 			user.save( function(err) {
@@ -195,7 +198,7 @@ app.put('/users/:id.:format?', function(req, res) {
 			            break;
 
 				        default:
-							// req.session.user_id = user.id;
+							req.session.user_id = user.id;
 				            res.redirect('/users');
 			        }
 				}
@@ -240,25 +243,22 @@ app.post('/sessions', function(req, res) {
 		if(!err) {
 			if (user && user.authenticate(req.body.user.password)) {
 				req.session.user_id = user.id;
-				res.redirect('/documents');
 
-		        // // Remember me
-		        // 		        if (req.body.remember_me) {
-		        // 		            var loginToken = new LoginToken({
-		        // 		                email: user.email
-		        // 		            });
-		        // 		            loginToken.save(function() {
-		        // 		                res.cookie('logintoken', loginToken.cookieValue, {
-		        // 		                    expires: new Date(Date.now() + 2 * 604800000),
-		        // 		                    path: '/'
-		        // 		                });
-		        // 		                res.redirect('/documents');
-		        // 		            });
-		        // 		        } else {
-		        // 		            res.redirect('/documents');
-		        // 		        }
+		        // Remember me
+   		        if (req.body.remember_me) {
+   		            var loginToken = new LoginToken({
+   		                email: user.email
+   		            });
+   		            loginToken.save(function() {
+   		                res.cookie('logintoken', loginToken.cookieValue, {
+   		                    expires: new Date(Date.now() + 2 * 604800000),
+   		                    path: '/'
+   		                });
+   		                res.redirect('/');
+   		            });
+   		        } else res.redirect('/');
 
-		    } else {
+			} else {
 				req.flash('error', 'Incorrect credentials');
 				res.redirect('/sessions/new');
 			}

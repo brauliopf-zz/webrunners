@@ -5,3 +5,5 @@ form(method='post', action='/users/' + user.id)
 	!=partial('../partials/users_fields', { locals: { user: user } })
 	div
 		input(type='submit', value='Save')
+		span \ or 
+			a(class='button', href='/users') Cancel

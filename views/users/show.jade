@@ -1,8 +1,11 @@
-h2 Name: #{user.name}
-	a(class='button', href='/users/' + user.id + '/edit') Edit
+h2 View User
 p
 	a(href='/users', class='button')
 		&larr; All Users
+	a(class='button', href='/users/' + user.id + '/edit') Edit
+p
+	b Name: 
+	=user.name
 p
 	b Email: 
 	=user.email
