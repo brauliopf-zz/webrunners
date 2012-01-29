@@ -11,7 +11,7 @@ var express = require('express'),
 	app = module.exports = express.createServer(),
     models = require('./models'),
     db,
-	Document, User, Offer;
+	Document, User, Offer, LoginToken;
 
 // Configuration
 // Middleware ordering is important
@@ -49,8 +49,40 @@ models.defineModels(mongoose, function() {
 	app.Document = Document = mongoose.model('DocumentModel');
 	app.User = User = mongoose.model('UserModel');
 	app.Offer = Offer = mongoose.model('OfferModel');
+	app.LoginToken = LoginToken = mongoose.model('LoginTokenModel');
 	db = mongoose.connect(app.set('db-uri')); //Instantiate database connection
 })
+
+function authenticateFromLoginToken(req, res, next) {
+	
+    var cookie = JSON.parse(req.cookies.logintoken);
+
+    LoginToken.findOne({ email: cookie.email, series: cookie.series, token: cookie.token },
+    (function(err, token) {
+        if (!token) {
+            res.redirect('/sessions/new');
+            return;
+        }
+
+        User.findOne({ email: token.email }, function(err, user) {
+            if (user) {
+                req.session.user_id = user.id;
+                req.currentUser = user;
+
+                token.token = token.randomToken();
+                token.save(function() {
+                    res.cookie('logintoken', token.cookieValue, {
+                        expires: new Date(Date.now() + 2 * 604800000),
+                        path: '/'
+                    });
+                    next();
+                });
+            } else {
+                res.redirect('/sessions/new');
+            }
+        });
+    }));
+}
 
 function loadUser(req, res, next) {
 	if (req.session.user_id) {
@@ -64,8 +96,8 @@ function loadUser(req, res, next) {
 				}
 			}
 		});
-	// } else if (req.cookies.logintoken) {
-	//     	authenticateFromLoginToken(req, res, next);
+	} else if (req.cookies.logintoken) {
+	    	authenticateFromLoginToken(req, res, next);
 	} else {
 		res.redirect('/sessions/new');
 	}
@@ -93,11 +125,9 @@ app.get('/admin', function(req, res) {
 /*
  * Route: Users
  */
-
 // List
 app.get('/users', function(req, res) {
-	// User.find({}, [], { sort: ['name', 'descending'] }, function(err, users) {
-	User.find({}, function(err, users) {
+	User.find({}, [], { sort: ['email', 'descending'] }, function(err, users) {
 		if(!err) {
 			res.render('users', {
 				locals: { users: users }
@@ -277,125 +307,6 @@ app.del('/sessions', function(req, res) {
 	    req.session.destroy(function() {});
 	}
 	res.redirect('/sessions/new');
-});
-
-/*
- * Route: Documents
- */
-// List
-app.get('/documents', function(req, res) {
-	Document.find({}, [], { sort: ['title', 'descending'] }, function(err, docs) {
-		if(!err) {
-			res.render('documents', {
-				locals: { documents: docs }
-			});
-		}
-	});
-});
-
-// Edit
-app.get('/documents/:id.:format?/edit', function(req, res) {
-	Document.findById(req.params.id, function(err, doc) {
-		if(!err) {
-			res.render('documents/edit.jade', {
-				locals: { d: doc }
-			});
-		}
-	});
-});
-
-// New
-app.get('/documents/new', function(req, res) {
-	res.render('documents/new.jade', {
-		locals: { d: new Document() }
-	});
-});
-
-/* ***CRUD Document*** */
-// Create document
-app.post('/documents.:format?', function(req, res) {
-    var d = new Document(req.body.document);
-    d.save( function(err) {
-        if(!err) {
-			switch (req.params.format) {
-	        	case 'json':
-		            res.send(d.__doc);
-	            break;
-
-		        default:
-		            res.redirect('/');
-	        }
-		}
-    });
-});
-
-// Read document
-app.get('/documents/:id.:format?', function(req, res) {
-    Document.findById(req.params.id, function(err, doc) {
-		if(!err) {
-			console.log(doc);
-	        switch (req.params.format) {
-		        case 'json':
-		            res.send(doc.__doc);
-		            break;
-
-		        default:
-		            res.render('documents/show.jade', {
-		                locals: { d: doc }
-		            });
-	        }
-		}
-    });
-});
-
-// Update document
-app.put('/documents/:id.:format?', function(req, res) {
-	// Load the document
-	Document.findById(req.body.document.id, function(err, doc) {
-		if(!err) {
-			// Do something with it
-			doc.title = req.body.document.title;
-			doc.data = req.body.document.data;
-
-			// Persist the changes
-			doc.save( function() {
-				// Respond according to the request format
-				switch (req.params.format) {
-					case 'json':
-						res.send(d.__doc);
-					break;
-					
-					default:
-						res.redirect('/');
-				}
-			});
-		}
-	});
-});
-
-// Delete document
-app.del('/documents/:id.:format?', function(req, res) {
-	// Load the document
-	Offer.findById(req.params.id, function(err, doc) {
-		if(!err) {
-			// Do something with it
-			doc.title = req.params.title;
-			doc.data = req.params.data;
-
-			// Persist the changes
-			doc.remove( function() {
-				// Respond according to the request format
-				switch (req.params.format) {
-				case 'json':
-				res.send(d.__doc);
-				break;
-
-				default:
-				res.redirect('/');
-				}
-			});
-		}
-	});
 });
 
 /*
