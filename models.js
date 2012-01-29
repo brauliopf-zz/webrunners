@@ -41,7 +41,7 @@ function defineModels(mongoose, fn){
 	}
 	
 	var UserSchema = new Schema({
-		'name': { type: String, default: 'name'},
+		'name': { type: String, unique: true },
 		'email': { type: String, validate: [validatePresenceOf, 'an email is required'], index: { unique: true } },
 		'hashed_password': String,
 		'salt': String,

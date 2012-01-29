@@ -55,20 +55,25 @@ models.defineModels(mongoose, function() {
 
 function authenticateFromLoginToken(req, res, next) {
 	
-    var cookie = JSON.parse(req.cookies.logintoken);
+   var cookie = JSON.parse(req.cookies.logintoken);
 
-    LoginToken.findOne({ email: cookie.email, series: cookie.series, token: cookie.token },
-    (function(err, token) {
+   LoginToken.findOne({
+		email: cookie.email,
+		series: cookie.series,
+		token: cookie.token
+   }, (function(err, token) {
         if (!token) {
             res.redirect('/sessions/new');
             return;
         }
 
         User.findOne({ email: token.email }, function(err, user) {
+			// Get user to sign in
             if (user) {
                 req.session.user_id = user.id;
                 req.currentUser = user;
 
+				// Renew Token
                 token.token = token.randomToken();
                 token.save(function() {
                     res.cookie('logintoken', token.cookieValue, {
@@ -80,14 +85,16 @@ function authenticateFromLoginToken(req, res, next) {
             } else {
                 res.redirect('/sessions/new');
             }
-        });
-    }));
+       	});
+   	}));
 }
 
 function loadUser(req, res, next) {
+	// Se já existe uma sessão iniciada com um id
 	if (req.session.user_id) {
 		User.findById(req.session.user_id, function(err, user) {
 			if(!err) {
+				// Verifica se o usuário que quer acessar é o dono da sessão
 				if (user) {
 					 req.currentUser = user;
 					 next();
@@ -96,8 +103,10 @@ function loadUser(req, res, next) {
 				}
 			}
 		});
+	// Se não existe uma sessão iniciada, verifica os cookies => autentica e faz login
 	} else if (req.cookies.logintoken) {
 	    	authenticateFromLoginToken(req, res, next);
+	// Se nem cookie existe, então o jeito é fazer login
 	} else {
 		res.redirect('/sessions/new');
 	}
@@ -106,7 +115,7 @@ function loadUser(req, res, next) {
 /*
  * Route: General use
  */
-app.get('/', function(req, res) {
+app.get('/', loadUser, function(req, res) {
 	Offer.find({}, [], { sort: ['start', 'descending'] }, function(err, offers) {
 		if(!err) {
 			res.render('index', {
@@ -118,7 +127,7 @@ app.get('/', function(req, res) {
 	});
 });
 
-app.get('/admin', function(req, res) {
+app.get('/admin', loadUser, function(req, res) {
 	res.render('./admin', { title:'WebRunners', currentUser: req.currentUser });
 });
 
@@ -126,7 +135,7 @@ app.get('/admin', function(req, res) {
  * Route: Users
  */
 // List
-app.get('/users', function(req, res) {
+app.get('/users', loadUser, function(req, res) {
 	User.find({}, [], { sort: ['email', 'descending'] }, function(err, users) {
 		if(!err) {
 			res.render('users', {
@@ -137,7 +146,7 @@ app.get('/users', function(req, res) {
 });
 
 // Edit
-app.get('/users/:id.:format?/edit', function(req, res) {
+app.get('/users/:id.:format?/edit', loadUser, function(req, res) {
 	User.findById(req.params.id, function(err, user) {
 		if(!err) {
 			res.render('users/edit.jade', {
@@ -203,11 +212,11 @@ app.get('/users/:id.:format?', function(req, res) {
 });
 
 // Update user
-app.put('/users/:id.:format?', function(req, res) {
+app.put('/users/:id.:format?', loadUser, function(req, res) {
 
-	function userSaveFailed() {
-		req.flash('error', 'Account creation failed');
-		res.render('users/new.jade', {
+	function userSaveFailed(user) {
+		req.flash('error', 'Account update failed');
+		res.render('users/edit.jade', {
 			locals: { user: user }
 		});
 	}
@@ -224,7 +233,9 @@ app.put('/users/:id.:format?', function(req, res) {
 
 			// Persist the changes
 			user.save( function(err) {
-		        if(err) return userSaveFailed();
+		        if(err){
+					return userSaveFailed(user);
+				}
 				else {
 					switch (req.params.format) {
 			        	case 'json':
@@ -242,7 +253,7 @@ app.put('/users/:id.:format?', function(req, res) {
 });
 
 // Delete user
-app.del('/users/:id.:format?', function(req, res) {
+app.del('/users/:id.:format?', loadUser, function(req, res) {
 	// Load the user
 	User.findById(req.params.id, function(err, user) {
 		if(!err) {
@@ -255,6 +266,126 @@ app.del('/users/:id.:format?', function(req, res) {
 
 				default:
 				res.redirect('/users');
+				}
+			});
+		}
+	});
+});
+
+/*
+ * Route: Offer
+ */
+// List
+app.get('/offers', loadUser, function(req, res) {
+	Offer.find({}, [], { sort: ['date', 'descending'] }, function(err, offers) {
+		if(!err) {
+			res.render('offers', {
+				locals: { offers: offers }
+			});
+		}
+	});
+});
+
+// Edit
+app.get('/offers/:id.:format?/edit', loadUser, function(req, res) {
+	Offer.findById(req.params.id, function(err, offer) {
+		if(!err) {
+			res.render('offers/edit.jade', {
+				locals: { offer: offer }
+			});
+		}
+	});
+});
+
+// New
+app.get('/offers/new', loadUser, function(req, res) {
+	res.render('offers/new.jade', {
+		locals: { offer: new Offer() }
+	});
+});
+
+/* ***CRUD Offer*** */
+// Create offer
+app.post('/offers.:format?', loadUser, function(req, res) {
+    var offer = new Offer(req.body.offer);
+    offer.save( function(err) {
+        if(!err) {
+			switch (req.params.format) {
+	        	case 'json':
+		            res.send(offer.__offer);
+	            break;
+
+		        default:
+		            res.redirect('/offers');
+	        }
+		}
+    });
+});
+
+// Read offer
+app.get('/offers/:id.:format?', loadUser, function(req, res) {
+    Offer.findById(req.params.id, function(err, offer) {
+		if(!err) {
+	        switch (req.params.format) {
+		        case 'json':
+		            res.send(offer.__offer);
+		            break;
+
+		        default:
+		            res.render('offers/show.jade', {
+		                locals: { offer: offer }
+		            });
+	        }
+		}
+    });
+});
+
+// Update offer
+app.put('/offers/:id.:format?', loadUser, function(req, res) {
+	// Load the offer
+	Offer.findById(req.body.offer.id, function(err, offer) {
+		if(!err) {
+			// Do something with it
+			offer.name = req.body.offer.name;
+			offer.start = req.body.offer.start;
+			offer.description = req.body.offer.description;
+			offer.image = req.body.offer.image;
+
+			// Persist the changes
+			offer.save( function() {
+				// Respond according to the request format
+				switch (req.params.format) {
+					case 'json':
+						res.send(offer.__offer);
+					break;
+					
+					default:
+						res.redirect('/offers');
+				}
+			});
+		}
+	});
+});
+
+// Delete offer
+app.del('/offers/:id.:format?', loadUser, function(req, res) {
+	// Load the offer
+	Offer.findById(req.params.id, function(err, offer) {
+		if(!err) {
+			// Do something with it
+			offer.title = req.params.title;
+			offer.data = req.params.data;
+
+			// Persist the changes
+			offer.remove( function() {
+				// Respond according to the request format
+				switch (req.params.format) {
+				case 'json':
+				res.send(offer.__offer);
+				break;
+
+				default:
+				res.redirect('/offers');
 				}
 			});
 		}
@@ -301,7 +432,7 @@ app.post('/sessions', function(req, res) {
 });
 
 // Delete
-app.del('/sessions', function(req, res) {
+app.del('/sessions', loadUser, function(req, res) {
 	if (req.session) { LoginToken.remove({ email: req.currentUser.email }, function() {});
 	    res.clearCookie('logintoken');
 	    req.session.destroy(function() {});
@@ -309,125 +440,36 @@ app.del('/sessions', function(req, res) {
 	res.redirect('/sessions/new');
 });
 
-/*
- * Route: Offer
- */
-// List
-app.get('/offers', function(req, res) {
-	Offer.find({}, [], { sort: ['date', 'descending'] }, function(err, offers) {
-		if(!err) {
-			res.render('offers', {
-				locals: { offers: offers }
-			});
-		}
-	});
-});
-
-// Edit
-app.get('/offers/:id.:format?/edit', function(req, res) {
-	Offer.findById(req.params.id, function(err, offer) {
-		if(!err) {
-			res.render('offers/edit.jade', {
-				locals: { offer: offer }
-			});
-		}
-	});
-});
-
-// New
-app.get('/offers/new', function(req, res) {
-	res.render('offers/new.jade', {
-		locals: { offer: new Offer() }
-	});
-});
-
-/* ***CRUD Offer*** */
-// Create offer
-app.post('/offers.:format?', function(req, res) {
-    var offer = new Offer(req.body.offer);
-    offer.save( function(err) {
-        if(!err) {
-			switch (req.params.format) {
-	        	case 'json':
-		            res.send(offer.__offer);
-	            break;
-
-		        default:
-		            res.redirect('/offers');
-	        }
-		}
-    });
-});
-
-// Read offer
-app.get('/offers/:id.:format?', function(req, res) {
-    Offer.findById(req.params.id, function(err, offer) {
-		if(!err) {
-	        switch (req.params.format) {
-		        case 'json':
-		            res.send(offer.__offer);
-		            break;
-
-		        default:
-		            res.render('offers/show.jade', {
-		                locals: { offer: offer }
-		            });
-	        }
-		}
-    });
-});
-
-// Update offer
-app.put('/offers/:id.:format?', function(req, res) {
-	// Load the offer
-	Offer.findById(req.body.offer.id, function(err, offer) {
-		if(!err) {
-			// Do something with it
-			offer.name = req.body.offer.name;
-			offer.start = req.body.offer.start;
-			offer.description = req.body.offer.description;
-			offer.image = req.body.offer.image;
-
-			// Persist the changes
-			offer.save( function() {
-				// Respond according to the request format
-				switch (req.params.format) {
-					case 'json':
-						res.send(offer.__offer);
-					break;
-					
-					default:
-						res.redirect('/offers');
-				}
-			});
-		}
-	});
-});
-
-// Delete offer
-app.del('/offers/:id.:format?', function(req, res) {
-	// Load the offer
-	Offer.findById(req.params.id, function(err, offer) {
-		if(!err) {
-			// Do something with it
-			offer.title = req.params.title;
-			offer.data = req.params.data;
-
-			// Persist the changes
-			offer.remove( function() {
-				// Respond according to the request format
-				switch (req.params.format) {
-				case 'json':
-				res.send(offer.__offer);
-				break;
-
-				default:
-				res.redirect('/offers');
-				}
-			});
-		}
-	});
-});
-
 app.listen(3000);
 console.log("Express server listening on port %d in %s mode", app.address().port, app.settings.env);
+
+/*
+ * Debugging
+ */
+function removeTokens (tokens) {
+	for (t in tokens){
+		tokens[t].remove( function() {
+			// Respond according to the request format
+			switch (tokens[t].format) {
+				case 'json':
+					res.send(d.__t);
+				break;
+	
+				default:
+			}
+		});
+	}
+}
+
+function listTokens (where) {
+	LoginToken.find({}, function(err, tokens) {
+		if(!err) {
+			// removeTokens(tokens);
+			console.log('Im at:' + where + '	');
+			console.log(tokens);
+		}
+	});
+
+}
+
+// listTokens('end');
