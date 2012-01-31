@@ -1,13 +1,67 @@
-h1 Your Offers
+- var text_button = 'Ver detalhes'
 
-p
-	a(class='button', href='/offers/new') + Offer
+//- Featured item
+#slider
+	#featureditem1
+		.new
+			img(src='images/new.png', alt='new')
+		.itemdescription
+			h1 SOME TITLE :
+			span
+				| Aliquam luctus lectus sit amet nibh facilisis feugiat. Morbi ullamcorper sem ut justo gravida at imperdiet facilisis.
+	#featureditem2
+		.new
+			img(src='images/new.png', alt='new')
+		.itemdescription
+			h1 SOME TITLE :
+			span
+				| Aliquam luctus lectus sit amet nibh facilisis feugiat. Morbi ullamcorper sem ut justo gravida at imperdiet facilisis.
+	#featureditem3
+		.new
+			img(src='images/new.png', alt='new')
+		.itemdescription
+			h1 SOME TITLE :
+			span
+				| Aliquam luctus lectus sit amet nibh facilisis feugiat. Morbi ullamcorper sem ut justo gravida at imperdiet facilisis.
+//- End of Featured item
 
-ul
-	- for (d in offers) {
-	li
-		a(class='button', href='/offers/' + offers[d].id + '/edit') Edit
-		a(class='button destroy', href='/offers/' + offers[d].id) Delete
-		a(href='/offers/' + offers[d].id)
-			=offers[d].name
+//- List Offers
+- var middle = false;
+- var len = offers.length;
+- for ( index = 0; index < len; index++ ) {
+#categorywrap
+	.category
+		#category-picture
+			img(src='/images/' + offers[index].image, alt='new')
+			.view-all
+				a(href='#')
+					b #{offers[index].name}
+				p #{offers[index].description}
+	- if(index+1 < len) {
+		- index++;
+	.category-middle
+		#category-picture
+			img(src='/images/' + offers[index].image, alt='new')
+			.view-all
+				a(href='#')
+					b #{offers[index].name}
+				p #{offers[index].description}
 	- }
+	- if(index+1 < len) {
+		- index++;
+	.category
+		#category-picture
+			img(src='/images/' + offers[index].image, alt='new')
+			.view-all
+				a(href='#')
+					b #{offers[index].name}
+				p #{offers[index].description}
+	- }
+-}
+//- End of List Offers
+
+//- Add FB-Share button. Run script right after load (header works fine) and add the link wherever you want the share button to appear.
+//- Find more here: http://developers.facebook.com/docs/share/
+//- ***
+//- script(type='text/javascript', src='http://static.ak.fbcdn.net/connect.php/js/FB.Share')
+//- a(name='fb_share')

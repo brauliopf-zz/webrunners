@@ -93,21 +93,29 @@ function loadUser(req, res, next) {
 	// Se já existe uma sessão iniciada com um id
 	if (req.session.user_id) {
 		User.findById(req.session.user_id, function(err, user) {
+			console.log('IF | !ERR');
 			if(!err) {
+				console.log('IF | !ERR OK');
 				// Verifica se o usuário que quer acessar é o dono da sessão
 				if (user) {
+					 console.log('IF USER');
 					 req.currentUser = user;
 					 next();
 				} else {
+					 console.log('IF | ELSE');
 					 res.redirect('/sessions/new');
 				}
 			}
 		});
 	// Se não existe uma sessão iniciada, verifica os cookies => autentica e faz login
 	} else if (req.cookies.logintoken) {
+			console.log('ELSE IF');
 	    	authenticateFromLoginToken(req, res, next);
 	// Se nem cookie existe, então o jeito é fazer login
 	} else {
+		console.log('ELSE');
+		if (typeof currentUser == 'undefined')
+			console.log('SOU UM CARA NAO DEFINIDO');
 		res.redirect('/sessions/new');
 	}
 }
@@ -158,9 +166,7 @@ app.get('/users/:id.:format?/edit', loadUser, function(req, res) {
 
 // New
 app.get('/users/new', function(req, res) {
-	res.render('users/new.jade', {
-		locals: { user: new User() }
-	});
+	res.render('users/new.jade', { user: new User(), layout: 'layout_login' });
 });
 
 /* ***CRUD User*** */
@@ -397,9 +403,7 @@ app.del('/offers/:id.:format?', loadUser, function(req, res) {
  */
 // New
 app.get('/sessions/new', function(req, res) {
-	res.render('sessions/new.jade', {
-		locals: { user: new User() }
-	});
+	res.render('sessions/new.jade', { user: new User(), layout: 'layout_login' });
 });
 
 // Create
@@ -472,4 +476,4 @@ function listTokens (where) {
 
 }
 
-// listTokens('end');
+listTokens('end');

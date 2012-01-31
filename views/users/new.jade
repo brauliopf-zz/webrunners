@@ -1,9 +1,14 @@
-.page
-	h2 Register
-
-	form.users(method='post', action='/users')
-		!=partial('../partials/users_fields', { locals: { user: user } })
+#login_content
+	.box
 		div
-			input(type='submit', value='Register')
-			span \ or 
-				a(href='/sessions/new') Log In
+			h1 Criar conta
+		div
+			form.users#login(method='post', action='/users')
+				!=partial('../partials/users_fields', { locals: { user: user }, register: true })
+				ul#inputs
+					li
+						a(href='#')
+							input(type='submit', value='Criar conta')
+					li
+						a(href='/sessions/new')
+							input(type='button', value='Log In')

@@ -21,11 +21,10 @@
 	padding: 16px 55px 0 60px;
 }
 #featureditem1 {
-	background-image: url(../images/marathon.jpg);
+	background-image: url(../images/banner_marathon.jpg);
 	background-repeat: no-repeat;
-	height: 243px;
+	height: 300px;
 	width: 940px;
-	margin-top: 30px;
 }
 #featureditem2 {
 	background-image: url(../images/featured2.png);
@@ -46,6 +45,6 @@
 	width: 940px;
 	overflow: hidden;
 	padding-bottom: 10px;
-	margin-bottom: 50px;
+	margin-bottom: 30px;
 }
 /*End of featured item*/

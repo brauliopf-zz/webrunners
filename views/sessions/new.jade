@@ -1,13 +1,14 @@
-.page
-	h2 Log In
-
-	p
-		a.button(href='/users/new') Create an account &rarr;
-
-	form.users#login(method='post', action='/sessions')
-		!=partial('../partials/users_fields', { locals: { user: user } })
+#login_content
+	.box
 		div
-			label(for='remember_me') Remember me:
-			input#remember_me(type='checkbox', name='remember_me')
+			h1 Log In
 		div
-			input(type='submit', value='Log In')
+			form.users#login(method='post', action='/sessions')
+				!=partial('../partials/users_fields', { locals: { user: user, register: false } })
+				ul#inputs
+					li
+						a(href='#')
+							input(type='submit', value='Log In')
+					li
+						a(href='/users/new')
+							input(type='button', value='Criar conta')

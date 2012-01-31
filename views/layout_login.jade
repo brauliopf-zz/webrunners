@@ -3,32 +3,34 @@ html
 	head
 		title= 'WebRunners'
 		link(rel='stylesheet', href='/stylesheets/style.css')
-		link(rel='stylesheet', href='/stylesheets/slider.css')
 		link(rel='stylesheet', href='/stylesheets/category.css')
+		link(rel='stylesheet', href='/stylesheets/slider.css')
 		script(type='text/javascript', src='https://ajax.googleapis.com/ajax/libs/jquery/1.4.4/jquery.min.js')
 		script(type='text/javascript')
 	body
-		#container
+		#container_login
 			#header
 				a(href='/')
 					#logo
 						img(src='../images/runner_transp.png', alt='webrunner')
 						.txt Web Runners
-				#nav
-					ul#navigation
-						li
-							a(href='#')
-								| Presentes
-						li
-							a(href='#')
-								| Experiências
-						li
-							a(href='#')
-								| Serviços
-						li
-							a(href='#')
-								| Produtos
-					.logout
-						a(href='#') Log Out
+				- if (typeof currentUser !== 'undefined') {
+				//- Navigation Menu
+				ul#navigation.grid_8
+					li
+						a(href='#')
+							| Presentes
+					li
+						a(href='#')
+							| Experiências
+					li
+						a(href='#')
+							| Serviços
+					li
+						a(href='#')
+							| Produtos
+				.logout
+					a(href='#') Log Out
+				- }
 			!= body
 		script(type='text/javascript', src='/javascripts/application.js')
