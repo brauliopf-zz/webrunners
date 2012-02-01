@@ -177,9 +177,7 @@ app.post('/users.:format?', function(req, res) {
 
 	function userSaveFailed() {
 		req.flash('error', 'Account creation failed');
-		res.render('users/new.jade', {
-			locals: { user: user }
-		});
+		res.render('users/new.jade', { user: new User(), layout: 'layout_login' });
 	}
 
 	user.save( function(err) {

@@ -36,12 +36,13 @@ a.button {
   margin: 0 10px 0 0;
   padding: 2px 4px;
   text-shadow: #faf9f9 0 1px 1px;
-  background-color: #eee;
+  background-color: #ccc;
   text-decoration: none;
   color: #000;
   -moz-border-radius: 4px;
   -webkit-border-radius: 4px;
   border-radius: 4px;
+	cursor: pointer;
 }
 a.button:hover {
   background-color: #fff;
@@ -100,27 +101,14 @@ textarea {
 #nav{
 	float:left;
 	margin-left: 300px;
-	display: compact;
-	margin-top: 0px;
+	margin-top: 50px;
 }
-#nav ul {
-	text-transform:uppercase;
+#nav a{
+	margin-right: 20px;
+	padding: 10px;
+	font-size: 18px;
 }
-#nav ul li{
-	display:inline;
-}
-#nav ul li a{
-	padding: 60px 0 0 0;
-	text-decoration: none;
-	color: white;
-	float:left;
-	margin-right: 10px;
-}
-#nav ul li a:hover,
-#nav ul li a.current{
-	background:url(../images/triangle.gif) no-repeat center top;
-}
-.logout{
+#logout{
 	position: absolute;
 	font: 10px "Lucida Grande", "Trebuchet MS", Verdana, sans-serif;
 	float: right;
@@ -202,7 +190,8 @@ form.users#login ul input{
 	width: 120px;
 	display: inline;
 	position: relative;
-	text-decoration: none;	
+	text-decoration: none;
+	cursor: pointer;
 }
 
 form.users#login ul li {
